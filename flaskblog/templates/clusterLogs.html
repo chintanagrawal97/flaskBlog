@@ -1,5 +1,23 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>About Page</h1>
-    <div>{{output}}</div>
+
+{% for post in specific_errs %}
+    {% if post['ErrorPresent'] %}
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata">
+      <p class="article-content">{{ post['Error'] }}</p>
+     
+      {% for filepath in post['Path'] %}
+      <p class="article-content">{{ filepath['filePath'] }}</p>
+      <p class="article-content">{{ filepath['errorMessage'][0][0:300] }}</p>
+      {% endfor %}
+
+    </div>
+  </div>
+</article>
+  {% endif %}
+
+{% endfor %}
+
 {% endblock content %}

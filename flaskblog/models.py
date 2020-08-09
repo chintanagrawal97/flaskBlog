@@ -29,3 +29,15 @@ class Post(db.Model):
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
+
+# class sparkLog():
+#     def __init__(self,data):
+#         self.specificE = data['SpecificError']
+#         self.filepath = data['filepath']
+#         self.res = data['res']
+#         self.flag = data['flag']
+#         self.Keyword = data['Keyword']
+#         self.KeywordLen = data['KeywordLen']
+#         self.resLen = data['resLen']
+#         self.specificW = data['SpecificWarn']
+#         self.flag = data['flag']

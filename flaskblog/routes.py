@@ -3,9 +3,15 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskblog import app, db, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm , ClusterForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm , ClusterForm 
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
+from flaskblog import sparkScript
+import json
+
+from flaskblog.test import sparkLog
+
+
 
 
 @app.route("/")
@@ -23,14 +29,27 @@ def about():
 def cluster():
     form = ClusterForm()
     if form.validate_on_submit():
-        return redirect(url_for('clusterLogs'))
+        CLUSTER_ID = form.cluster.data
+        APPLICATION_ID = form.application.data
+        KEY_WORD =form.keyword.data.lower()
+        LOGPATH= str(form.logpath.data)
+
+        sparkScript.MainProgram(CLUSTER_ID,APPLICATION_ID,'',False,LOGPATH)
+
+        with open("sample.json", "r") as read_file:
+            data = json.load(read_file)
+        dataset = sparkLog(data)
+        dataset.convertSpecificError()
         
+        # return render_template('clusterLogs.html', title='Cluster Out', specific_errs=data["SpecificError"])
+        return render_template('clusterLogs.html', title='Cluster Out', specific_errs=dataset.specificE)
+
     return render_template('cluster_input.html', title='Cluster',form=form)
 
-@app.route("/clusterLogs" , methods=['GET', 'POST'])
-def clusterLogs():
-    return render_template('clusterLogs.html', title='Cluster Out',output='Hello')
 
+# @app.route("/clusterLogs" , methods=['GET', 'POST'])
+# def clusterLogs(sparklog):
+#     return render_template('clusterLogs.html', title='Cluster Out', data=sparklog)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():

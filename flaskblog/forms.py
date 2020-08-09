@@ -39,6 +39,8 @@ class ClusterForm(FlaskForm):
     cluster = StringField('Cluster ID',
                         validators=[DataRequired()])
     application = StringField('Application ID', validators=[DataRequired()])
+    logpath = StringField('Log Path', validators=[DataRequired()])
+
     keyword = StringField('Keywords')
     submit = SubmitField('Submit')
 
