@@ -1,17 +1,24 @@
 import os
-import secrets
+import secrets , json
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort
+from flask import render_template, url_for, flash, redirect, request, abort , g , current_app
 from flaskblog import app, db, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm , ClusterForm 
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm , ClusterForm ,SearchForm
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
-from flaskblog import sparkScript
-import json
-
+from flaskblog import sparkScript 
+from datetime import datetime
+from flask_babel import get_locale , gettext
 from flaskblog.test import sparkLog
 
 
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
+        g.search_form = SearchForm()
+    g.locale = str(get_locale())
 
 
 @app.route("/")
@@ -173,3 +180,20 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your post has been deleted!', 'success')
     return redirect(url_for('home'))
+
+
+
+@app.route('/search')
+@login_required
+def search():
+    if not g.search_form.validate():
+        return redirect(url_for('home'))
+    page = request.args.get('page', 1, type=int)
+    posts, total = Post.search(g.search_form.q.data, page,
+                               current_app.config['POSTS_PER_PAGE'])
+    next_url = url_for('search', q=g.search_form.q.data, page=page + 1) \
+        if total > page * current_app.config['POSTS_PER_PAGE'] else None
+    prev_url = url_for('search', q=g.search_form.q.data, page=page - 1) \
+        if page > 1 else None
+    return render_template('search.html', title=gettext('Search'), posts=posts,
+                           next_url=next_url, prev_url=prev_url)

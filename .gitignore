@@ -1,2 +1,5 @@
 # Ignore the python Binaries
 sparkEnv/
+
+#Ignore compiled bytecode     
+flaskblog/__pycache__/*
