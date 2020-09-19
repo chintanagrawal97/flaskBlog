@@ -18,10 +18,29 @@
                     {{ form.title(class="form-control form-control-lg") }}
                 {% endif %}
             </div>
+            <div class="aticle-data">
+                <div class="data-ipt">
+                    <p>Classification : {{form.category(placeholder="Can only Write One")}}</p>
+                    <p>Label: {{form.tags(placeholder="Separate by Commas")}}</p>
+                </div>
+            </div>
+            <div class="aticle-body">
+                <div class="write-body">
+                    <p>{{form.title(class="aticle-title",placeholder="Title")}}</p>
+                    <div>
+                        {{form.content(id="editormd",style="display:block;",rows="5",cols="80")}}<br>
+                    </div>
+                    {% if title == 'Write an essay' %}
+                    <p>{{ form.submit(class="write-btn",value="Release") }}</p>
+                    {% else %}
+                    <p>{{ form.submit(class="write-btn",value="Update") }}</p>
+                    {% endif %}
+                </div>
+            </div>
             <div class="form-group">
                 {{ form.content.label(class="form-control-label") }}
                 {% if form.content.errors %}
-                    {{ form.content(class="form-control form-control-lg is-invalid") }}
+                {{form.content(id="editormd",style="display:block;",rows="5",cols="80")}}<br>
                     <div class="invalid-feedback">
                         {% for error in form.content.errors %}
                             <span>{{ error }}</span>
@@ -38,3 +57,34 @@
     </form>
 </div>
 {% endblock content %}
+{% block script %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/simplemde/1.11.2/simplemde.min.css">
+    <script src="https://cdn.bootcss.com/simplemde/1.11.2/simplemde.min.js"></script>
+    <script>
+         new SimpleMDE({
+         element: document.getElementById("editormd"),
+         spellChecker: false,
+         autosave: {
+            enabled: false
+         }
+      });
+    </script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script>
+        function showChild(ele) {
+            var childNav = ele.parentNode.getElementsByClassName('menu-child')[0];
+            console.log(childNav)
+            if (childNav.style.display === 'none') {
+                childNav.style.display = 'block';
+            } else {
+                childNav.style.display ='none'
+            }
+        }
+    </script>
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/blog.css') }}">
+<link  type="text/css" href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "admin.html" %}
+
+{% block tab %}Edit article{% endblock %}
+{% block content %}
+<div class="content-section">
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+           
+            <div class="aticle-body">
+                <div class="write-body">
+                    <p>{{form.title(class="aticle-title",placeholder="Title")}}</p>
+                    <p>{{form.category(class="aticle-title",placeholder="Classification")}}</p>
+                    <p>{{form.tags(class="aticle-title",placeholder="Separate by Commas")}}</p>
+
+                    <div>
+                        {{form.content(id="editormd",style="display:block;",rows="5",cols="80")}}<br>
+                    </div>
+                    <div>
+                        {{ form.submit(class="write-btn",value="Submit") }}
+                    </div>
+                </div>
+            </div>
+           
+        </fieldset>
+    </form>
+</div>
+{% endblock content %}
+
+{% block script %}
+    {{ super() }}
+    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/simplemde/1.11.2/simplemde.min.css">
+    <script src="https://cdn.bootcss.com/simplemde/1.11.2/simplemde.min.js"></script>
+    <script>
+         new SimpleMDE({
+         element: document.getElementById("editormd"),
+         spellChecker: false,
+         autosave: {
+            enabled: false
+         }
+      });
+    </script>
+{% endblock %}

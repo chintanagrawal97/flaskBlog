@@ -1,0 +1,8 @@
+"": ["--load-plugins", "pylint-flask", "pylint-flask-sqlalchemy"]
+{    
+    "settings-key": {
+       "setting-1":  true,
+       "python.linting.pylintArgs":  "../css/",
+       "setting-3": "> 0.2%, last 1 version"
+   }
+}

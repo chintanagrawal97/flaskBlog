@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if title %}{{title}}{%else%}Admin{%endif%} | Admin</title>
+    {% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/blog.css') }}">
+    <link  type="text/css" href="{{ url_for('static', filename='css/admin.css') }}" rel="stylesheet">
+    {% endblock %}
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <div class="container">
+        <div class="admin-main">
+            <div class="body-tabs">
+                <a href="{{ url_for('main.home') }}">Home</a> / <span>{% block tab %}{% endblock %}</span>
+            </div>
+            <div class="admin-body">
+                <div class="site-wrap">
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-msg">
+                            {{ message }}
+                            <span class="flash-x" onclick="flashEvent()">x</span>
+                        </div>
+                    {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                </div>
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+    {% block script %}
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script>
+        function showChild(ele) {
+            var childNav = ele.parentNode.getElementsByClassName('menu-child')[0];
+            console.log(childNav)
+            if (childNav.style.display === 'none') {
+                childNav.style.display = 'block';
+            } else {
+                childNav.style.display ='none'
+            }
+        }
+    </script>
+    {% endblock %}
+{% else %}
+<div class="admin-menu">
+    <p>
+        <a href="{{url_for('admin.login')}}"><button>请先登录</button></a>
+    </p>
+
+</div>
+{% endif %}
+</body>
+</html>
