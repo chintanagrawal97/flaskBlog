@@ -59,4 +59,12 @@ def delete_post(post_id):
     flash('Your post has been deleted!', 'success')
     return redirect(url_for('main.home'))
 
+@posts.route("/tag/<tag_name>/")
+def tag(tag_name):
+    tag = tag_name
+    page = request.args.get('page', 1, type=int)
+    all_posts = Post.query.filter(Post.tags != None).order_by(Post.date_posted.desc()).all()
+    posts = (post for post in all_posts if post.tag_in_post(tag))
+    
+    return render_template('post/tag.html', posts=posts)
 

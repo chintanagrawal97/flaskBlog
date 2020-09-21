@@ -35,37 +35,20 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
 
-class Admin(UserMixin, db.Model):
-    __tablename__ = 'admin'
+class Tag(db.Model):
+    __tablename__ = 'tags'
     id = db.Column(db.Integer, primary_key=True)
-    site_name = db.Column(db.String(4))
-    site_title = db.Column(db.String(255))
-    name = db.Column(db.String(4))
-    profile = db.Column(db.String(255))
-    login_name = db.Column(db.String(500))
-    password_hash = db.Column(db.String(500))
+    tag = db.Column(db.String(25), index=True)
 
-    record_info = db.Column(db.String(255), nullable=True)
-
-    def __init__(self, **kwargs):
-        super(Admin, self).__init__(**kwargs)
-
-    # 对密码进行加密保存
-    @property
-    def password(self):
-        raise AttributeError('password is not a readable attribute')
-
-    @password.setter
-    def password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    def to_json(self):
+        tag = {
+            'tag': self.tag,
+            'posts': url_for('api.get_tag_posts', tag=self.tag, _external=True)
+        }
+        return tag
 
     def __repr__(self):
-        return '<Admin %r>' % (self.name)
-
-
+        return '<Tag %r>' % (self.tag)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -74,6 +57,7 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    tags = db.Column(db.String(64))
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
@@ -82,8 +66,35 @@ class Post(db.Model):
         html = markdown_to_html(self.content)
         return html
 
+    def tag_in_post(self, tag):
+        if self.tags.find(',') > -1:
+            tags = [i for i in self.tags.split(',')]
+            if tag in tags:
+                return True
+            return False
+        else:
+            if tag == self.tags:
+                return True
+            return False
 
 
+class Category(db.Model):
+    __tablename__ = 'category'
+    id = db.Column(db.Integer, primary_key=True)
+    category = db.Column(db.String(6), index=True)
+
+    posts = db.relationship('Post', backref='category', lazy='dynamic')
+
+    def to_json(self):
+        category = {
+            'category': self.category,
+            'post_count': self.posts.count(),
+            'posts': url_for('api.get_category_posts', category=self.category, _external=True)
+        }
+        return category
+
+    def __repr__(self):
+        return '<Category %r>' % (self.category)
 
 def init_db():
         db.create_all()
